@@ -232,6 +232,27 @@ error_opendir:
 
 int main(int argc, char **argv)
 {
+	int opt;
+
+	while ((opt = getopt(argc, argv, "h")) != -1) {
+		switch (opt) {
+			case 'h':
+				printf("treezy version %s (%s)\n", VER, VERDATE);
+				printf("Copyright (C) 2019-2020 by Jody Bruchon <jody@jodybruchon.com>\n");
+				printf("Licensed under the terms of The MIT License.\n");
+				exit(EXIT_SUCCESS);
+				break;
+			case '?':
+				fprintf(stderr, "Unrecognized option: '%c'\n", optopt);
+				exit(EXIT_FAILURE);
+				break;
+			default:
+				fprintf(stderr, "Internal error in getopt(), please report as a bug\n");
+				exit(EXIT_FAILURE);
+				break;
+		}
+	}
+
 	count.dirs = 0; count.files = 0; count.symlinks = 0;
 
 	if (traverse_dir(".", 1) < 0) exit(EXIT_FAILURE);
