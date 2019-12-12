@@ -35,14 +35,14 @@ endif
 
 # MinGW needs this for printf() conversions to work
 ifeq ($(OS), Windows_NT)
+NO_UNICODE=1  # Not working yet
 ifndef NO_UNICODE
 	UNICODE=1
 	COMPILER_OPTIONS += -municode
-	PROGRAM_SUFFIX=.exe
 endif
+	PROGRAM_SUFFIX=.exe
 	COMPILER_OPTIONS += -D__USE_MINGW_ANSI_STDIO=1 -DON_WINDOWS=1
 	OBJS += win_stat.o winres.o
-	override undefine ENABLE_FSDEDUP
 endif
 
 CFLAGS += $(COMPILER_OPTIONS) $(CFLAGS_EXTRA)
@@ -57,9 +57,9 @@ all: $(PROGRAM_NAME)
 $(PROGRAM_NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(PROGRAM_NAME) $(OBJS)
 
-#winres.o : winres.rc winres.manifest.xml
-#	./tune_winres.sh
-#	windres winres.rc winres.o
+winres.o : winres.rc winres.manifest.xml
+	./tune_winres.sh
+	windres winres.rc winres.o
 
 installdirs:
 	test -e $(DESTDIR)$(BIN_DIR) || $(MKDIR) $(DESTDIR)$(BIN_DIR)
@@ -84,6 +84,6 @@ stripped: $(PROGRAM_NAME)
 	strip $(PROGRAM_NAME)$(PROGRAM_SUFFIX)
 
 clean:
-	$(RM) $(OBJS) $(OBJS_CLEAN) $(PROGRAM_NAME) $(PROGRAM_NAME).exe *~ *.gcno *.gcda *.gcov
+	$(RM) $(OBJS) $(OBJS_CLEAN) $(PROGRAM_NAME) $(PROGRAM_NAME)$(PROGRAM_SUFFIX) *~ *.gcno *.gcda *.gcov
 
 distclean: clean

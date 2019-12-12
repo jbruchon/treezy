@@ -30,18 +30,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/stat.h>
 //#include <sys/time.h>
 #include <unistd.h>
 
+#include "treezy.h"
 #include "version.h"
 
 #define ISFLAG(a,b) ((a & b) == b)
 #define SETFLAG(a,b) (a |= b)
 #define CLEARFLAG(a,b) (a &= (~b))
-
-#define treezy_mode_t mode_t
-#define treezy_ino_t ino_t
 
 /* Behavior modification flags */
 #define F_RECURSE		(1U << 0)
@@ -79,34 +76,14 @@ struct filetree {
   struct filetree *right;
 };
 
-/* Suffix definitions (treat as case-insensitive) */
-struct size_suffix {
-  const char * const suffix;
-  const int64_t multiplier;
-};
-
-const char *FILE_MODE_RO = "rb";
 const char dir_sep[] = "/";
 
-static const char *program_name;
+const char *program_name;
 
-static unsigned long errors = 0;
-
-/* Larger chunk size makes large files process faster but uses more RAM */
-#ifndef CHUNK_SIZE
- #define CHUNK_SIZE 32768
-#endif
-
-/* Maximum path buffer size to use; must be large enough for a path plus
- * any work that might be done to the array it's stored in. PATH_MAX is
- * not always true. Read this article on the false promises of PATH_MAX:
- * http://insanecoding.blogspot.com/2007/11/pathmax-simply-isnt.html
- */
-#define PATHBUF_SIZE 1023
-#define PATHBUF_SIZE_ALLOC 1024
+unsigned long errors = 0;
 
 /* Size suffixes - this gets exported */
-static const struct size_suffix size_suffix[] = {
+const struct size_suffix size_suffix[] = {
   /* Byte (someone may actually try to use this) */
   { "b", 1 },
   { "k", 1024 },
@@ -146,7 +123,7 @@ struct {
 
 
 /* Out of memory */
-static void oom(const char * const restrict msg)
+void oom(const char * const restrict msg)
 {
   fprintf(stderr, "\nout of memory: %s\n", msg);
   exit(EXIT_FAILURE);
@@ -154,7 +131,7 @@ static void oom(const char * const restrict msg)
 
 
 /* Null pointer failure */
-static void nullptr(const char * restrict func)
+void nullptr(const char * restrict func)
 {
   static const char n[] = "(NULL)";
   if (func == NULL) func = n;
@@ -164,7 +141,11 @@ static void nullptr(const char * restrict func)
 
 int traverse_dir(const char *name, const int recurse)
 {
+#ifdef ON_WINDOWS
+	struct winstat s;
+#else
 	struct stat s;
+#endif
 	struct dirent *dir;
 	DIR *cd;
 	char *fullpath;
@@ -194,29 +175,38 @@ int traverse_dir(const char *name, const int recurse)
 
 		strcpy(tailpath, dir->d_name);
 
-		printf("%s:ino=%lu:dtype=%d", fullpath, dir->d_ino, dir->d_type);
-		result = lstat(fullpath, &s);
+		printf("%s:ino=%lu", fullpath, dir->d_ino);
+		result = STAT(fullpath, &s);
 		if (result != 0) {
-			fprintf(stderr, "  lstat failed for %s\n", fullpath);
+			fprintf(stderr, "  stat failed for %s\n", fullpath);
 			errors++;
 		} else {
+#ifndef NO_DTYPE
 			switch (dir->d_type) {
 			case DT_REG: printf(":type=f"); count.files++; break;
 			case DT_DIR: printf(":type=d"); count.dirs++; isdir = 1; break;
 			case DT_LNK: printf(":type=l"); count.symlinks++; break;
 			case DT_UNKNOWN:
 			default:
+#endif /* NO_DTYPE */
 				if (S_ISREG(s.st_mode)) { printf(":type=f"); count.files++; }
 				else if (S_ISDIR(s.st_mode)) { printf(":type=d"); isdir = 1; count.dirs++; }
+#ifndef NO_SYMLINKS
 				else if (S_ISLNK(s.st_mode)) { printf(":type=l"); count.symlinks++; }
+#endif
+#ifndef NO_DTYPE
 				break;
 			}
+#endif
 		}
 		printf("\n");
 		errno = 0;
 
 		/* recurse */
-		if (recurse && isdir) traverse_dir(fullpath, 1);
+		if (recurse && isdir) {
+			LOUD(fprintf(stderr, "isdir-recurse -> '%s'\n", fullpath););
+			traverse_dir(fullpath, 1);
+		}
 	}
 
 	free(fullpath);
@@ -230,7 +220,11 @@ error_opendir:
 }
 
 
+#ifdef UNICODE
+int wmain(int argc, wchar_t **wargv)
+#else
 int main(int argc, char **argv)
+#endif
 {
 	int opt;
 
