@@ -198,7 +198,11 @@ int traverse_dir(const char *name, const int recurse)
 				break;
 			}
 #endif
-		printf(":ino=%llu:dev=%u:size=%lld:nlink=%u", s.st_ino, s.st_dev, s.st_size, s.st_nlink);
+		printf(":ino=%llu:dev=%lu:size=%lld:nlink=%lu",
+				(long long unsigned int)s.st_ino,
+				(long unsigned int)s.st_dev,
+				(long long int)s.st_size,
+				(long unsigned int)s.st_nlink);
 		}
 		printf("\n");
 		errno = 0;
