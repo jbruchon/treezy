@@ -175,7 +175,7 @@ int traverse_dir(const char *name, const int recurse)
 
 		strcpy(tailpath, dir->d_name);
 
-		printf("%s:ino=%lu", fullpath, dir->d_ino);
+		printf("%s:d_ino=%lu", fullpath, dir->d_ino);
 		result = STAT(fullpath, &s);
 		if (result != 0) {
 			fprintf(stderr, "  stat failed for %s\n", fullpath);
@@ -198,6 +198,7 @@ int traverse_dir(const char *name, const int recurse)
 				break;
 			}
 #endif
+		printf(":ino=%llu:dev=%u:size=%lld:nlink=%u", s.st_ino, s.st_dev, s.st_size, s.st_nlink);
 		}
 		printf("\n");
 		errno = 0;
