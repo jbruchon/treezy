@@ -50,32 +50,6 @@
  #define LOUD(a)
 #endif
 
-/* Per-file information */
-struct file {
-  struct _file *parent;
-  struct _file *child;
-  char *name;
-  dev_t device;
-  treezy_mode_t mode;
-  off_t size;
-  treezy_ino_t inode;
-  time_t mtime;
-  uint32_t flags;  /* Status flags */
-#ifndef NO_HARDLINKS
-  nlink_t nlink;
-#endif
-#ifndef NO_PERMS
-  uid_t uid;
-  gid_t gid;
-#endif
-};
-
-struct filetree {
-  struct file *file;
-  struct filetree *left;
-  struct filetree *right;
-};
-
 const char dir_sep[] = "/";
 
 const char *program_name;
@@ -139,6 +113,8 @@ void nullptr(const char * restrict func)
   exit(EXIT_FAILURE);
 }
 
+
+/* Read the contents of a directory, and optionally its subdirectories */
 int traverse_dir(const char *name, const int recurse)
 {
 #ifdef ON_WINDOWS

@@ -36,6 +36,7 @@ extern "C" {
 #ifdef ON_WINDOWS
  typedef uint64_t treezy_ino_t;
  typedef uint32_t treezy_mode_t;
+ typedef uint32_t treezy_nlink_t;
  extern const char dir_sep[];
  #ifdef UNICODE
   extern const wchar_t *FILE_MODE_RO;
@@ -47,6 +48,7 @@ extern "C" {
  #include <sys/stat.h>
  typedef ino_t treezy_ino_t;
  typedef mode_t treezy_mode_t;
+ typedef nlink_t treezy_nlink_t;
  extern const char *FILE_MODE_RO;
  extern const char dir_sep[];
  #ifdef UNICODE
@@ -120,34 +122,25 @@ extern uint_fast32_t flags;
 #endif
 
 /* Per-file information */
-typedef struct _file {
-  struct _file *duplicates;
-  struct _file *next;
-  char *d_name;
-  dev_t device;
+struct filetree {
+  struct filetree *parent;	// NULL if specified on command line
+  struct filetree *next;	// Next file in the same directory
+  struct filetree *child;	// If this is a dir, first entry in this dir
+  char *name;
   treezy_mode_t mode;
   off_t size;
   treezy_ino_t inode;
+  dev_t device;
   time_t mtime;
   uint32_t flags;  /* Status flags */
 #ifndef NO_HARDLINKS
- #ifndef ON_WINDOWS
-  nlink_t nlink;
- #else
-  uint32_t nlink;  /* link count on Windows is always a DWORD */
- #endif
+  treezy_nlink_t nlink;
 #endif
 #ifndef NO_PERMS
   uid_t uid;
   gid_t gid;
 #endif
 } file_t;
-
-typedef struct _filetree {
-  file_t *file;
-  struct _filetree *left;
-  struct _filetree *right;
-} filetree_t;
 
 /* Pick a stat() function */
 #ifdef ON_WINDOWS
