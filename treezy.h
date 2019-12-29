@@ -149,14 +149,6 @@ struct filetree {
  #define STAT lstat
 #endif
 
-/* -X exclusion parameter stack */
-struct exclude {
-  struct exclude *next;
-  unsigned int flags;
-  int64_t size;
-  char param[];
-};
-
 /* Suffix definitions (treat as case-insensitive) */
 struct size_suffix {
   const char * const suffix;
