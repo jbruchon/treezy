@@ -209,9 +209,10 @@ int main(int argc, char **argv)
 {
 	int opt;
 
-	while ((opt = getopt(argc, argv, "h")) != -1) {
+	while ((opt = getopt(argc, argv, "hv")) != -1) {
 		switch (opt) {
 			case 'h':
+			case 'v':
 				printf("treezy version %s (%s)\n", VER, VERDATE);
 				printf("Copyright (C) 2019-2020 by Jody Bruchon <jody@jodybruchon.com>\n");
 				printf("Licensed under the terms of The MIT License.\n");

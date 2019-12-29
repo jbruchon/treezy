@@ -16,6 +16,23 @@ Usage: treezy
 In its current state, the software scans the current working directory
 and its subtrees. There are no options.
 
+Compatibility warning
+--------------------------------------------------------------------------
+DO NOT RELY ON THIS PROGRAM'S OUTPUT FORMAT IN SCRIPTS!
+
+This program is currently in very early development and only produces
+machine-readable output to demonstrate functionality of the underlying
+code. This output is guaranteed to change in the future, especially
+because the program will be changed to output user-friendly messages and
+output information by default.
+
+If you want to use the program in scripts immediately, it is a good idea
+to write in a version check. Use `treezy -v` to get the program version
+information. The version number will change when output format changes.
+
+Example script code to get the version number into $TREEZYVER:
+`TREEZYVER=$(treezy -v | grep version | sed 's/[^0-9]*//;s/ .*//')`
+
 Contact information
 --------------------------------------------------------------------------
 For all inquiries, contact Jody Bruchon <jody@jodybruchon.com>
