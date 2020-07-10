@@ -20,7 +20,7 @@ BEGIN
 		    VALUE "FileDescription", "treezy File Tree Swiss army knife"
 		    VALUE "FileVersion", "0,1,0,0"
 		    VALUE "InternalName", "treezy"
-		    VALUE "LegalCopyright", "(C) 2019-2010 Jody Bruchon, jody@jodybruchon.com"
+		    VALUE "LegalCopyright", "(C) 2019-2020 Jody Bruchon, jody@jodybruchon.com"
 		    VALUE "OriginalFilename", "treezy.exe"
 		    VALUE "ProductName", "treezy"
 		    VALUE "ProductVersion", "0,1,0,0"

@@ -40,7 +40,7 @@ For all inquiries, contact Jody Bruchon <jody@jodybruchon.com>
 
 Legal information and software license
 --------------------------------------------------------------------------
-treezy is Copyright (C) 2015-2019 by Jody Bruchon <jody@jodybruchon.com>
+treezy is Copyright (C) 2019-2020 by Jody Bruchon <jody@jodybruchon.com>
 
 The MIT License
 
